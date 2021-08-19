@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(graphbuilder)
 
-# GoogleTest requires at least C++11
 set(CMAKE_CXX_STANDARD 14)
 
 include(FetchContent)
@@ -15,6 +14,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+add_library(graphbuilder graph.cc graphbuilder.cc)
 add_executable(graphman manualtest.cc graph.cc graphbuilder.cc)
 add_executable(graph_test graph_test.cc graph.cc)
 target_link_libraries(
