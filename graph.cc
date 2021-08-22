@@ -22,7 +22,7 @@ void Graph::addEdge(int source, int destination)
     if (source > maxNode || destination > maxNode)
     {
         std::string message = "source and destination ids have to be between" + std::to_string(0) + " and " + std::to_string(maxNode);
-        throw std::invalid_argument(message);
+        throw std::out_of_range(message);
     }
 
     auto&& destinationOutputs = nodes[destination].getOutputs();
@@ -48,34 +48,34 @@ void Graph::addEdges(const std::vector<std::pair<int, int>>& edges)
     
 }
 
-const std::vector<std::pair<int, int>>* Graph::getDependencies()
+const std::vector<std::pair<int, int>> Graph::getDependencies()
 {
-    std::vector<std::pair<int, int>>* dependencies = new std::vector<std::pair<int, int>>();
+    std::vector<std::pair<int, int>> dependencies;
     
     for (auto&& node : nodes)
     {
         for(int input : node.getOutputs())
         {
-            dependencies->push_back({node.getNumber(), input});
+            dependencies.push_back({node.getNumber(), input});
         }
     }
 
     return dependencies;
 }
 
-const std::vector<std::set<int>>* Graph::getParallelBatches()
+const std::vector<std::set<int>> Graph::getParallelBatches()
 {
     if (!isDag())
     {
         throw GraphException("Graph contains circular dependency.");
     }
 
-    auto parallelBatches = new std::vector<std::set<int>>();
+    std::vector<std::set<int>> parallelBatches;
     auto sourceNodes = getSourceNodes();
     std::set<int> inProgress;
     std::set<int> done;
 
-    std::copy(sourceNodes->begin(), sourceNodes->end(), std::inserter(inProgress, inProgress.end()));
+    std::copy(sourceNodes.begin(), sourceNodes.end(), std::inserter(inProgress, inProgress.end()));
     while (done.size() != nodes.size())
     {
         //add every node with satisfied dependencies to the current batch
@@ -109,22 +109,21 @@ const std::vector<std::set<int>>* Graph::getParallelBatches()
             }
         }
 
-        parallelBatches->push_back(currentBatch);
+        parallelBatches.push_back(currentBatch);
     }
     
-    delete sourceNodes;
     return parallelBatches;
 }
 
-const std::vector<int>* Graph::getSourceNodes()
+const std::vector<int> Graph::getSourceNodes()
 {
     //find all nodes without inputs
-    auto sourceNodes = new std::vector<int>();
+    std::vector<int> sourceNodes;
     for (auto&& node : nodes)
     {
         if (node.getInputs().empty()) 
         {
-            sourceNodes->push_back(node.getNumber());
+            sourceNodes.push_back(node.getNumber());
         }
     }
 

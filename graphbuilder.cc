@@ -14,23 +14,33 @@ Graph* FileGraphBuilder::build() {
 
     if (!input.is_open())
     {
-        //TODO
+        throw std::invalid_argument("Cannot open file.");
     }
     
-    if (getline(input, line)) 
+    try
     {
-        int nodeCount = stoi(line);
-        graph = new Graph(nodeCount);      
-    }
+        if (getline(input, line)) 
+        {
+            int nodeCount = stoi(line);
+            graph = new Graph(nodeCount);      
+        }
 
-    std::vector<int> edge;
-    while (getline(input, line))
-    {
-        auto edge = parseEdge(line);
-        int source = std::get<0>(edge);
-        int destination = std::get<1>(edge);
-        graph->addEdge(source, destination);
+        std::vector<int> edge;
+        while (getline(input, line))
+        {
+            auto edge = parseEdge(line);
+            int source = std::get<0>(edge);
+            int destination = std::get<1>(edge);
+            graph->addEdge(source, destination);
+        }
     }
+    catch(const std::exception& e)
+    {
+        delete graph;
+        throw;
+    }
+    
+    
 
     return graph;
 }

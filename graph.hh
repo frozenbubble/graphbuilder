@@ -4,6 +4,7 @@
 #include <exception>
 #include <set>
 #include <string>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -35,20 +36,16 @@ class Graph
     const std::vector<Node>& getNodes() { return nodes; }
     void addEdge(int source, int destination);
     void addEdges(const std::vector<std::pair<int, int>>& edges);
-    const std::vector<int>* getSourceNodes();
-    const std::vector<std::pair<int, int>>* getDependencies();
-    const std::vector<std::set<int>>* getParallelBatches();
+    const std::vector<int> getSourceNodes();
+    const std::vector<std::pair<int, int>> getDependencies();
+    const std::vector<std::set<int>> getParallelBatches();
     bool isDag();
 };
 
-class GraphException : public std::exception
+class GraphException : public std::logic_error
 {
-    private:
-    std::string message;
-
     public :
-    GraphException(const char* msg): message(msg) {}
-    const char* what() { return message.c_str(); }
+    GraphException(const char* msg): std::logic_error(msg) {}
 };
 
 
