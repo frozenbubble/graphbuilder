@@ -39,8 +39,6 @@ Graph* FileGraphBuilder::build() {
         delete graph;
         throw;
     }
-    
-    
 
     return graph;
 }

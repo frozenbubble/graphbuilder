@@ -75,6 +75,14 @@ const std::vector<std::set<int>> Graph::getParallelBatches()
     std::set<int> inProgress;
     std::set<int> done;
 
+    // Copy dependencies to mutable sets
+    std::vector<std::set<int>> nodeDependencies(nodes.size());
+    for (int i = 0; i < nodes.size(); i++)
+    {
+        std::set<int> depI(nodes[i].getInputs());
+        nodeDependencies[i] = depI;
+    }
+
     std::copy(sourceNodes.begin(), sourceNodes.end(), std::inserter(inProgress, inProgress.end()));
     while (done.size() != nodes.size())
     {
@@ -83,16 +91,7 @@ const std::vector<std::set<int>> Graph::getParallelBatches()
         for (int currentNode : inProgress)
         {
             //check if all dependencies are done
-            bool allDependenciesDone = true;
-            for (int d : nodes[currentNode].getInputs())
-            {
-                if (done.find(d) == done.end())
-                {
-                    allDependenciesDone = false;
-                }
-            }
-
-            if (allDependenciesDone)
+            if (nodeDependencies[currentNode].size() == 0)
             {
                 currentBatch.insert(currentNode);
             }
@@ -103,9 +102,13 @@ const std::vector<std::set<int>> Graph::getParallelBatches()
         {
             inProgress.erase(node);
             done.insert(node);
+            
             for (int output : nodes[node].getOutputs())
             {
                 inProgress.insert(output);
+
+                // remove this node from the dependency lists of its outputs
+                nodeDependencies[output].erase(node);
             }
         }
 
